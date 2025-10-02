@@ -79,19 +79,14 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
 
-      - name: Create ZIP file
+      - name: Sign APK
         run: |
-          zip -r project.zip .  # 打包整个项目为 ZIP 文件
-
-      - name: Upload ZIP file
-        uses: actions/upload-artifact@v4
-        with:
-          name: project-zip
-          path: project.zip
+          cp ./project/platforms/android/app/build/outputs/apk/debug/app-debug.apk .
+          apksigner sign --ks 0.2Studio.keystore --ks-key-alias 0.2Studio --ks-pass pass:file:pass.txt --key-pass pass:file:pass.txt --out app-signed.apk app-debug.apk
 
       - name: Upload artifacts to tag
         uses: xresloader/upload-to-github-release@2bcae85344d41e21f7fc4c47fa2ed68223afdb49
         with:
-          file: ./project/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          file: ./app-signed.apk
           draft: false
           tag_name: "deep-sea-build"
