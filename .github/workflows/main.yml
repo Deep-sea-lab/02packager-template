@@ -94,14 +94,11 @@ jobs:
           # Copy unsigned APK (use release if available: app-release-unsigned.apk)
           cp ./project/platforms/android/app/build/outputs/apk/debug/app-debug.apk app-debug.apk
           
-          # Align APK
-          zipalign -v -p 4 app-debug.apk app-aligned.apk
-          
           # Sign with v1+v2+v3
           apksigner sign --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
             --ks 0.2Studio.keystore --ks-key-alias 0.2Studio \
             --ks-pass pass:file:pass.txt --key-pass pass:file:pass.txt \
-            --out app-signed.apk app-aligned.apk
+            --out app-signed.apk app-debug.apk
           
           # Verify signature
           apksigner verify --print-certs --verbose app-signed.apk
