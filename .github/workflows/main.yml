@@ -88,18 +88,17 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
 
+      # Copy APK
+      - name: Copy APK
+        run: cp ./project/platforms/android/app/build/outputs/apk/debug/app-debug.apk app-debug.apk
+
       # Sign APK
       - name: Sign APK
         run: |
-          # Copy unsigned APK (use release if available: app-release-unsigned.apk)
-          cp ./project/platforms/android/app/build/outputs/apk/debug/app-debug.apk app-debug.apk
-          
-          # Sign with v1+v2+v3
-          apksigner sign --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --v4-signing-enabled true \
+          apksigner sign --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
             --ks 0.2Studio.keystore --ks-key-alias 0.2Studio \
             --ks-pass pass:0.2Studio --key-pass pass:0.2Studio \
-            --out app-signed.apk app-debug.apk
-        
+            --out app-signed.apk app-debug.apk    
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
