@@ -56,7 +56,7 @@ jobs:
       # Setup signing files (keystore and pass.txt already in repo)
       - name: Setup signing files
         run: |
-          chmod 600 0.2Studio.keystore pass.txt  # 安全权限
+          chmod 600 0.2Studio.keystore # 安全权限
 
       # Install Cordova globally
       - name: Install Cordova
