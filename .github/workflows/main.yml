@@ -99,10 +99,13 @@ jobs:
             --ks 0.2Studio.keystore --ks-key-alias 0.2Studio \
             --ks-pass pass:0.2Studio --key-pass pass:0.2Studio \
             --out app-signed.apk app-debug.apk
-          
-          # Verify signature
-          apksigner verify --print-certs --verbose app-signed.apk
         
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
+
+      - name: Verify signature
+        run: apksigner verify --print-certs --verbose app-signed.apk
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
