@@ -105,7 +105,7 @@ jobs:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
 
       - name: Verify signature
-        run: apksigner verify --verbose --print-certs app-signed.apk app-signed.apk.idsig
+        run: apksigner verify --verbose --print-certs app-signed.apk
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
