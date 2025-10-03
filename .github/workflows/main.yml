@@ -43,11 +43,20 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
 
+      # Add Build Tools to PATH (fixes apksigner command not found)
+      - name: Add Build Tools to PATH
+        run: echo "$ANDROID_HOME/build-tools/30.0.3" >> $GITHUB_PATH
+
       # Set up Gradle
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '7.6.5' # Specify a stable Gradle version compatible with Android builds
+
+      # Setup signing files (keystore and pass.txt already in repo)
+      - name: Setup signing files
+        run: |
+          chmod 600 0.2Studio.keystore pass.txt  # 安全权限
 
       # Install Cordova globally
       - name: Install Cordova
@@ -70,7 +79,7 @@ jobs:
           cd project
           npm install
 
-      # Run npm build
+      # Run npm build (assumes this runs cordova build android --debug)
       - name: Build project
         run: |
           cd project
@@ -79,14 +88,31 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
 
+      # Sign APK
       - name: Sign APK
         run: |
-          cp ./project/platforms/android/app/build/outputs/apk/debug/app-debug.apk .
-          apksigner sign --ks 0.2Studio.keystore --ks-key-alias 0.2Studio --ks-pass pass:file:pass.txt --key-pass pass:file:pass.txt --out app-signed.apk app-debug.apk
+          # Copy unsigned APK (use release if available: app-release-unsigned.apk)
+          cp ./project/platforms/android/app/build/outputs/apk/debug/app-debug.apk app-debug.apk
+          
+          # Align APK
+          zipalign -v -p 4 app-debug.apk app-aligned.apk
+          
+          # Sign with v1+v2+v3
+          apksigner sign --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+            --ks 0.2Studio.keystore --ks-key-alias 0.2Studio \
+            --ks-pass pass:file:pass.txt --key-pass pass:file:pass.txt \
+            --out app-signed.apk app-aligned.apk
+          
+          # Verify signature
+          apksigner verify --print-certs --verbose app-signed.apk
+          
+          # Cleanup (only temp files; keep keystore and pass.txt)
+          rm app-debug.apk app-aligned.apk
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
 
+      # Upload artifacts to tag
       - name: Upload artifacts to tag
         uses: xresloader/upload-to-github-release@2bcae85344d41e21f7fc4c47fa2ed68223afdb49
         with:
