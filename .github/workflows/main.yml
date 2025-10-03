@@ -97,14 +97,12 @@ jobs:
           # Sign with v1+v2+v3
           apksigner sign --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
             --ks 0.2Studio.keystore --ks-key-alias 0.2Studio \
-            --ks-pass pass:file:pass.txt --key-pass pass:file:pass.txt \
+            --ks-pass pass:0.2Studio --key-pass pass:0.2Studio \
             --out app-signed.apk app-debug.apk
           
           # Verify signature
           apksigner verify --print-certs --verbose app-signed.apk
-          
-          # Cleanup (only temp files; keep keystore and pass.txt)
-          rm app-debug.apk app-aligned.apk
+        
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
